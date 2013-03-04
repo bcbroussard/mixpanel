@@ -16,7 +16,7 @@ module Mixpanel::Event
   end
 
   def append_track(event, properties={})
-    append 'track', event, track_properties(properties, false)
+    append 'track', event, track_properties(properties, false, false)
   end
 
   protected
@@ -27,9 +27,11 @@ module Mixpanel::Event
     parse_response request(url, options[:async])
   end
 
-  def track_properties(properties, include_token=true)
-    default = {:time => Time.now, :ip => ip}
-    properties = default.merge(properties)
+  def track_properties(properties, include_ip_and_time=true, include_token=true)
+    if include_ip_and_time
+      default = {:time => Time.now, :ip => ip}
+      properties = default.merge(properties)
+    end
 
     properties.merge!(:token => @token) if include_token
     properties_hash(properties, EVENT_PROPERTIES)
